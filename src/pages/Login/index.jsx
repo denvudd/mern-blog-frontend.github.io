@@ -38,7 +38,7 @@ export const Login = () => {
     }
   };
 
-  if (isAuth) {
+  if (!window.localStorage.getItem("token") && !isAuth) {
     return <Navigate to="/" />;
   }
 
@@ -65,7 +65,13 @@ export const Login = () => {
           helperText={errors.password?.password}
           {...register("password", { required: "Укажите пароль" })}
         />
-        <Button disabled={!isValid} type="submit" size="large" variant="contained" fullWidth>
+        <Button
+          disabled={!isValid}
+          type="submit"
+          size="large"
+          variant="contained"
+          fullWidth
+        >
           Войти
         </Button>
       </form>

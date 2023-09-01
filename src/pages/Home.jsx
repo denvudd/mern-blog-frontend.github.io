@@ -13,6 +13,7 @@ import { CommentsBlock } from "../components/CommentsBlock";
 export const Home = () => {
   const dispatch = useDispatch();
   const { posts, tags } = useSelector((state) => state.posts);
+  const userData = useSelector((state) => state.auth.data);
 
   const isPostsLoading = posts.status === "loading";
   const isTagsLoading = tags.status === "loading";
@@ -36,8 +37,8 @@ export const Home = () => {
           {isPostsLoading &&
             [...Array(5)].map((_, index) => <Post key={index} isLoading />)}
           {!isPostsLoading &&
-            posts.items.length > 0 &&
-            posts.items.map((post, index) => (
+            !!posts.items.length &&
+            posts.items.map((post) => (
               <Post
                 _id={post._id}
                 title={post.title}
@@ -47,15 +48,12 @@ export const Home = () => {
                 viewsCount={post.viewsCount}
                 commentsCount={3}
                 tags={post.tags}
-                isEditable
+                isEditable={userData?._id === post.user._id}
               />
             ))}
         </Grid>
         <Grid xs={4} item>
-          <TagsBlock
-            items={tags.items}
-            isLoading={isTagsLoading}
-          />
+          <TagsBlock items={tags.items} isLoading={isTagsLoading} />
           <CommentsBlock
             items={[
               {
