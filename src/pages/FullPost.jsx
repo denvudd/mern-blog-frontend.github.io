@@ -31,7 +31,7 @@ export const FullPost = () => {
       <Post
         _id={post._id}
         title={post.title}
-        imageUrl={post.imageUrl}
+        imageUrl={post.imageUrl ? `http://localhost:4444${post.imageUrl}` : ""}
         user={post.user}
         createdAt={post.createdAt}
         viewsCount={post.viewsCount}
@@ -39,7 +39,7 @@ export const FullPost = () => {
         tags={post.tags}
         isFullPost
       >
-        <ReactMarkdown children={post.text}/>
+        <ReactMarkdown children={post.text} />
       </Post>
       <CommentsBlock
         items={[

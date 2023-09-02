@@ -8,12 +8,29 @@ import "easymde/dist/easymde.min.css";
 import styles from "./AddPost.module.scss";
 import { useSelector } from "react-redux";
 import { isAuthSelector } from "../../redux/slices/auth";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import axios from "../../axios";
 
 export const AddPost = () => {
   const isAuth = useSelector(isAuthSelector);
   const navigate = useNavigate();
+  const { id } = useParams();
+
+  const isEditing = Boolean(id);
+
+  React.useEffect(() => {
+    // edit
+    if (id) {
+      axios.get(`/posts/${id}`).then((res) => {
+        setFormState((prevState) => ({
+          text: res.data.text,
+          title: res.data.title,
+          tags: res.data.tags.join(" "),
+          imageUrl: res.data.imageUrl,
+        }));
+      });
+    }
+  }, []);
 
   const [formState, setFormState] = React.useState({
     text: "",
@@ -64,13 +81,17 @@ export const AddPost = () => {
       const payload = {
         title: formState.title,
         text: formState.text,
-        tags: formState.tags.split(","),
+        tags: formState.tags,
         imageUrl: formState.imageUrl,
       };
 
-      const { data } = await axios.post("/posts", payload);
+      const { data } = isEditing
+        ? await axios.patch(`/posts/${id}`, payload)
+        : await axios.post("/posts", payload);
 
-      navigate(`/posts/${data._id}`);
+      const _id = isEditing ? id : data._id;
+
+      navigate(`/posts/${_id}`);
     } catch (error) {
       console.warn(error);
       alert("Ошибка при создании поста!");
@@ -174,7 +195,7 @@ export const AddPost = () => {
             size="large"
             variant="contained"
           >
-            Опубликовать
+            {isEditing ? "Сохранить" : "Опубликовать"}
           </Button>
           <Button type="button" size="large">
             Отмена
